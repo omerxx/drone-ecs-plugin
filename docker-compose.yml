@@ -1,0 +1,15 @@
+drone-ecs-deploy:
+  build: .
+  environment:
+    - PLUGIN_REGION=us-east-1
+    - PLUGIN_FAMILY=staging-proxy
+    - PLUGIN_IMAGE_NAME=mycompany/proxy
+    - PLUGIN_IMAGE_TAG=latest
+    - PLUGIN_SERVICE=staging-proxy
+    - PLUGIN_CLUSTER=staging-machine
+    - PLUGIN_ENVIRONMENT_VARIABLES='ONE=1,TWO=2'
+    - PLUGIN_PORT_MAPPINGS='0 80'
+    - PLUGIN_MEMORY='800'
+    - PLUGIN_LOG_DRIVER=awslogs
+    - PLUGIN_LOG_OPTIONS=awslogs-group=staging-proxy,awslogs-region=us-east-1
+    

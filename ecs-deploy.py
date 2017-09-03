@@ -1,0 +1,105 @@
+#!/bin/python
+
+import os
+import boto3
+
+def pp(name):
+    # pp as in plugin parameter 
+    param = os.environ.get('{}_{}'.format('PLUGIN', name.upper()))
+    if param:
+        return param
+    else:
+        print 'No such variable {}'.format(name)
+
+
+ACCESS_KEY = pp('access_key')
+SECRET_KEY = pp('secret_key')
+AWS_REGION = pp('region')
+
+
+def port_handler(paramString):
+    omap = []
+    portSets = paramString.split(',')
+    for set in portSets:
+        omap.append(
+            {
+                'containerPort': int(set.split(' ')[1]),
+                'hostPort': int(set.split(' ')[0])
+            }
+        )
+    print omap
+    return omap
+
+
+def env_handler(paramString):
+    omap = []
+    envSets = paramString.split(',')
+    for set in envSets:
+        omap.append(
+            {
+                'name': set.split('=')[0],
+                'value': set.split('=')[1]
+            }
+        )
+
+    return omap  
+
+
+def options_handler(paramString):
+    opts = {}
+    optSets = paramString.split(',')
+    for set in optSets:
+        opts[set.split('=')[0]] = set.split('=')[1]
+
+    return opts 
+
+
+def register_task_definition():
+    try:
+        taskResponse = client.register_task_definition(
+            family = pp('family'),
+            containerDefinitions = [
+                {
+                    'name': '{}-container'.format((pp('family'))),
+                    'image': '{}:{}'.format(pp('image_name'), pp('image_tag')),
+                    'memory': int(pp('memory')),
+                    'portMappings': port_handler(pp('port_mappings')),
+                    'environment': env_handler(pp('environment_variables')),
+                    'logConfiguration': {
+                        'logDriver': pp('log_driver'),
+                        'options': options_handler(pp('log_options'))
+                    }
+                }
+            ]
+        )
+        print 'Completing new task registration...'
+        return taskResponse['taskDefinition']['taskDefinitionArn']
+    except Exception as e:
+        print 'Error registring TaskDefinition: {}'.format(e)
+        exit(1)
+
+
+def update_service(taskArn):
+    try:
+        updateResponse = client.update_service(
+            cluster = pp('cluster'),
+            service = pp('service'),
+            taskDefinition = taskArn
+        )
+        print 'Completing service update to cluster'
+
+    except Exception as e:
+        print 'Error updating service: {}'.format(e)
+
+
+if __name__ == "__main__":
+    global client 
+    client = boto3.client(
+        'ecs',
+        aws_access_key_id=ACCESS_KEY,
+        aws_secret_access_key=SECRET_KEY,
+        region_name=AWS_REGION
+    )
+
+    update_service(register_task_definition())
+ 
