@@ -87,6 +87,7 @@ def update_service(taskArn):
 
     except Exception as e:
         print 'Error updating service: {}'.format(e)
+        exit(1)
 
 
 ACCESS_KEY = pp('access_key')
