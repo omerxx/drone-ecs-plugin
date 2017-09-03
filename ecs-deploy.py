@@ -10,11 +10,8 @@ def pp(name):
         return param
     else:
         print 'No such variable {}'.format(name)
+        return None
 
-
-ACCESS_KEY = pp('access_key')
-SECRET_KEY = pp('secret_key')
-AWS_REGION = pp('region')
 
 
 def port_handler(paramString):
@@ -27,7 +24,7 @@ def port_handler(paramString):
                 'hostPort': int(set.split(' ')[0])
             }
         )
-    print omap
+
     return omap
 
 
@@ -90,6 +87,11 @@ def update_service(taskArn):
 
     except Exception as e:
         print 'Error updating service: {}'.format(e)
+
+
+ACCESS_KEY = pp('access_key')
+SECRET_KEY = pp('secret_key')
+AWS_REGION = pp('region')
 
 
 if __name__ == "__main__":
