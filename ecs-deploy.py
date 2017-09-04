@@ -84,6 +84,7 @@ def update_service(taskArn):
             taskDefinition = taskArn
         )
         print 'Completing service update to cluster'
+        print updateResponse
 
     except Exception as e:
         print 'Error updating service: {}'.format(e)
