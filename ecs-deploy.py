@@ -13,7 +13,6 @@ def pp(name):
         return None
 
 
-
 def port_handler(paramString):
     omap = []
     portSets = paramString.split(',')
@@ -32,10 +31,12 @@ def env_handler(paramString):
     omap = []
     envSets = paramString.split(',')
     for set in envSets:
+        value = os.environ.get(set.split('=')[0]) if not set.split('=')[1] and os.environ.get(set.split('=')[0]) else set.split('=')[1]
+            
         omap.append(
             {
                 'name': set.split('=')[0],
-                'value': set.split('=')[1]
+                'value': value
             }
         )
 
