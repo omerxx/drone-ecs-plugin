@@ -71,6 +71,8 @@ def register_task_definition():
             ]
         )
         print 'Completing new task registration...'
+        print taskResponse
+        print 'Revision: {}'.format(taskResponse['taskDefinition']['revision'])
         return taskResponse['taskDefinition']['taskDefinitionArn']
     except Exception as e:
         print 'Error registring TaskDefinition: {}'.format(e)
@@ -110,6 +112,8 @@ def register_task_definition_dockersock():
             ],
         )
         print 'Completing new task registration...'
+        print taskResponse
+        print 'Revision: {}'.format(taskResponse['taskDefinition']['revision'])
         return taskResponse['taskDefinition']['taskDefinitionArn']
     except Exception as e:
         print 'Error registring TaskDefinition: {}'.format(e)
@@ -145,5 +149,5 @@ if __name__ == "__main__":
         region_name=AWS_REGION
     )
 
-    update_service(register_task_definition())if not pp('mount_dockersock') else update_service(register_task_definition_dockersock())
+    update_service(register_task_definition()) if not pp('mount_dockersock') else update_service(register_task_definition_dockersock())
  
