@@ -66,9 +66,48 @@ def register_task_definition():
                     'logConfiguration': {
                         'logDriver': pp('log_driver'),
                         'options': options_handler(pp('log_options'))
-                    }
+                    },
                 }
             ]
+        )
+        print 'Completing new task registration...'
+        return taskResponse['taskDefinition']['taskDefinitionArn']
+    except Exception as e:
+        print 'Error registring TaskDefinition: {}'.format(e)
+        exit(1)
+
+
+def register_task_definition_dockersock():
+    try:
+        taskResponse = client.register_task_definition(
+            family = pp('family'),
+            containerDefinitions = [
+                {
+                    'name': '{}-container'.format((pp('family'))),
+                    'image': '{}:{}'.format(pp('image_name'), pp('image_tag')),
+                    'memory': int(pp('memory')),
+                    'portMappings': port_handler(pp('port_mappings')),
+                    'environment': env_handler(pp('environment_variables')),
+                    'logConfiguration': {
+                        'logDriver': pp('log_driver'),
+                        'options': options_handler(pp('log_options'))
+                    },
+                    'mountPoints': [
+                        {
+                            'sourceVolume': 'dockersock',
+                            'containerPath': '/var/run/docker.sock'
+                        },
+                    ],
+                }
+            ],
+            volumes = [
+                {
+                    'name': 'dockersock',
+                    'host': {
+                        'sourcePath': '/var/run/docker.sock'
+                    }
+                },
+            ],
         )
         print 'Completing new task registration...'
         return taskResponse['taskDefinition']['taskDefinitionArn']
@@ -106,5 +145,5 @@ if __name__ == "__main__":
         region_name=AWS_REGION
     )
 
-    update_service(register_task_definition())
+    update_service(register_task_definition())if not pp('mount_dockersock') else update_service(register_task_definition_dockersock())
  
