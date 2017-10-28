@@ -33,3 +33,9 @@
     when:
       branch: [master]
 ```
+
+Mounting `docker.sock` to `/var/run/docker.sock` can be done by adding the setting:
+```yaml
+mount_dockersock: true
+```
+
