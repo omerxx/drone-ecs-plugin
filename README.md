@@ -7,7 +7,7 @@
 
 ```yaml
  deploy-production:
-    image: omerxx/drone-ecs-plugin:17
+    image: omerxx/drone-ecs-plugin:18
     cluster: my-cluster
     region: us-east-1
     service: my-service
