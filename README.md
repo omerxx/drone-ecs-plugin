@@ -23,6 +23,9 @@
     port_mappings:
       - 0 3000
     memory: 800
+    source_volume: config_file.json
+    source_path: .
+    container_path: /etc/config/config_file.json
     log_driver: awslogs
     log_options:
       - awslogs-group=my-service
