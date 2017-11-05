@@ -119,6 +119,46 @@ def register_task_definition_dockersock():
         print 'Error registring TaskDefinition: {}'.format(e)
         exit(1)
 
+def register_task_definition_mount():
+    try:
+        taskResponse = client.register_task_definition(
+            family = pp('family'),
+            containerDefinitions = [
+                {
+                    'name': '{}-container'.format((pp('family'))),
+                    'image': '{}:{}'.format(pp('image_name'), pp('image_tag')),
+                    'memory': int(pp('memory')),
+                    'portMappings': port_handler(pp('port_mappings')),
+                    'environment': env_handler(pp('environment_variables')),
+                    'logConfiguration': {
+                        'logDriver': pp('log_driver'),
+                        'options': options_handler(pp('log_options'))
+                    },
+                    'mountPoints': [
+                        {
+                            'sourceVolume': pp('source_volume'),
+                            'containerPath': pp('container_path')
+                        },
+                    ],
+                }
+            ],
+            volumes = [
+                {
+                    'name': pp('source_volume'),
+                    'host': {
+                        'sourcePath': pp('source_path')
+                    }
+                },
+            ],
+        )
+        print 'Completing new task registration...'
+        print taskResponse
+        print 'Revision: {}'.format(taskResponse['taskDefinition']['revision'])
+        return taskResponse['taskDefinition']['taskDefinitionArn']
+    except Exception as e:
+        print 'Error registring TaskDefinition: {}'.format(e)
+        exit(1)
+
 
 def update_service(taskArn):
     try:
@@ -148,6 +188,9 @@ if __name__ == "__main__":
         aws_secret_access_key=SECRET_KEY,
         region_name=AWS_REGION
     )
-
-    update_service(register_task_definition()) if not pp('mount_dockersock') else update_service(register_task_definition_dockersock())
+    
+    if pp('source_volume') and pp('container_path') and pp('source_path'):
+        update_service(register_task_definition_mount()) 
+    else:
+        update_service(register_task_definition()) if not pp('mount_dockersock') else update_service(register_task_definition_dockersock())
  
